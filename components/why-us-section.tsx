@@ -1,40 +1,106 @@
 "use client"
 
-import { useScrollAnimation } from "@/hooks/use-scroll-animation"
+import { Award, Briefcase, ThumbsUp } from "lucide-react"
+import { useState, useEffect } from "react"
 
-export function WhyUsSection() {
-  const ref = useScrollAnimation()
+interface CounterProps {
+  end: number
+  duration?: number
+  suffix?: string
+  prefix?: string
+}
+
+function Counter({ end, duration = 2000, suffix = "", prefix = "" }: CounterProps) {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    let startTime: number | null = null
+    const startValue = 0
+
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime
+      const progress = Math.min((currentTime - startTime) / duration, 1)
+
+      setCount(Math.floor(progress * (end - startValue) + startValue))
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [end, duration])
 
   return (
-    <section ref={ref} className="py-20 lg:py-28 scroll-animation">
-      <div className="container mx-auto px-6 text-center">
-        <div className="mb-16">
+    <span>
+      {prefix}
+      {count}
+      {suffix}
+    </span>
+  )
+}
+
+export function WhyUsSection() {
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    const element = document.getElementById("why-us-section")
+    if (element) observer.observe(element)
+
+    return () => {
+      if (element) observer.unobserve(element)
+    }
+  }, [])
+
+  return (
+    <section id="why-us-section" className="py-20 lg:py-28 bg-gradient-to-br from-accent/10 via-background to-card">
+      <div className="container mx-auto px-6">
+        <div className="mb-16 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">Warum Winter & Usselmann GbR?</h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
             Von Küste zu Küste sind wir der vertrauenswürdige Partner für anspruchsvolle Wohnungsrenovierungen.
           </p>
         </div>
-        <div className="flex flex-wrap justify-center items-center gap-12 lg:gap-20">
-          {/* 15+ Years */}
-          <div className="flex flex-col items-center animate-fade-in">
-            <div className="w-48 h-48 bg-gray-800 dark:bg-gray-950 rounded-full flex flex-col justify-center items-center shadow-2xl shadow-gray-500/20 transition-all duration-500 hover:scale-110 hover:shadow-3xl hover:shadow-gray-500/40 animate-pulse-slow cursor-pointer">
-              <span className="text-5xl font-bold text-white">15+</span>
-              <span className="text-gray-300 mt-1">Jahre Erfahrung</span>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Jahre Erfahrung */}
+          <div className="text-center p-8 rounded-xl bg-card/50 backdrop-blur-sm border border-border shadow-lg transform hover:scale-105 transition-all duration-300">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-400 rounded-full mb-4 animate-subtle-zoom">
+              <Award className="w-8 h-8 text-gray-900" />
             </div>
+            <div className="text-5xl font-bold text-foreground mb-2">
+              {isVisible && <Counter end={15} suffix="+" />}
+            </div>
+            <p className="text-muted-foreground font-semibold text-lg">Jahre Erfahrung</p>
           </div>
-          {/* 200+ Projects */}
-          <div className="flex flex-col items-center animate-fade-in animation-delay-200">
-            <div className="w-56 h-56 bg-yellow-400 rounded-full flex flex-col justify-center items-center shadow-2xl shadow-yellow-500/30 transition-all duration-500 hover:scale-110 hover:shadow-3xl hover:shadow-yellow-500/50 animate-pulse-slow cursor-pointer">
-              <span className="text-5xl font-bold text-gray-900">200+</span>
-              <span className="text-gray-800 mt-1">Projekte</span>
+
+          {/* Projekte */}
+          <div className="text-center p-8 rounded-xl bg-card/50 backdrop-blur-sm border border-border shadow-lg transform hover:scale-105 transition-all duration-300">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-400 rounded-full mb-4 animate-subtle-zoom">
+              <Briefcase className="w-8 h-8 text-gray-900" />
             </div>
+            <div className="text-5xl font-bold text-foreground mb-2">
+              {isVisible && <Counter end={200} suffix="+" />}
+            </div>
+            <p className="text-muted-foreground font-semibold text-lg">Projekte</p>
           </div>
-          {/* 100% Satisfaction */}
-          <div className="flex flex-col items-center animate-fade-in animation-delay-400">
-            <div className="w-48 h-48 bg-indigo-600 rounded-full flex flex-col justify-center items-center shadow-2xl shadow-indigo-500/30 transition-all duration-500 hover:scale-110 hover:shadow-3xl hover:shadow-indigo-500/50 animate-pulse-slow cursor-pointer">
-              <span className="text-5xl font-bold text-white">100%</span>
-              <span className="text-gray-200 mt-1">Zufriedenheit</span>
+
+          {/* Zufriedenheit */}
+          <div className="text-center p-8 rounded-xl bg-card/50 backdrop-blur-sm border border-border shadow-lg transform hover:scale-105 transition-all duration-300">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-400 rounded-full mb-4 animate-subtle-zoom">
+              <ThumbsUp className="w-8 h-8 text-gray-900" />
             </div>
+            <div className="text-5xl font-bold text-foreground mb-2">100%</div>
+            <p className="text-muted-foreground font-semibold text-lg">Zufriedenheit</p>
           </div>
         </div>
       </div>
