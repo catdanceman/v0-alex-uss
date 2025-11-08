@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, X, Phone } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 import Image from "next/image"
 
@@ -43,13 +43,6 @@ export function Header() {
           </nav>
 
           <div className="flex items-center space-x-4">
-            <a
-              href="tel:+4915141389442"
-              className="hidden lg:flex items-center gap-2 text-foreground/70 hover:text-accent-foreground transition-colors font-semibold"
-            >
-              <Phone className="w-5 h-5" />
-              <span>0151 – 413 894 42</span>
-            </a>
             <ThemeToggle />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -73,13 +66,6 @@ export function Header() {
                   {link.label}
                 </a>
               ))}
-              <a
-                href="tel:+4915141389442"
-                className="flex items-center justify-center gap-2 text-foreground/70 hover:text-accent-foreground transition-colors font-semibold py-2 border-t border-border"
-              >
-                <Phone className="w-5 h-5" />
-                <span>0151 – 413 894 42</span>
-              </a>
             </nav>
           </div>
         )}
