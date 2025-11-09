@@ -1,7 +1,9 @@
 "use client"
 
+import type React from "react"
+
 import { X } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 interface ContactModalProps {
   isOpen: boolean
@@ -9,6 +11,9 @@ interface ContactModalProps {
 }
 
 export function ContactModal({ isOpen, onClose }: ContactModalProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden"
@@ -19,6 +24,44 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
       document.body.style.overflow = "unset"
     }
   }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSubmitStatus("idle")
+    }
+  }, [isOpen])
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setIsSubmitting(true)
+    setSubmitStatus("idle")
+
+    const formData = new FormData(event.currentTarget)
+    formData.append("access_key", "cb12ff43-05c0-4c52-b98c-e7648ff67914")
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setSubmitStatus("success")
+        ;(event.target as HTMLFormElement).reset()
+        setTimeout(() => {
+          onClose()
+        }, 2000)
+      } else {
+        setSubmitStatus("error")
+      }
+    } catch (error) {
+      setSubmitStatus("error")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   if (!isOpen) return null
 
@@ -39,7 +82,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
         </button>
 
         <h3 className="text-2xl font-bold text-center text-foreground mb-6">Kostenlose Beratung anfordern</h3>
-        <form action="#" method="POST">
+        <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
@@ -93,12 +136,29 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
               />
             </div>
           </div>
+
+          {submitStatus === "success" && (
+            <div className="mt-4 p-3 bg-green-500/20 border border-green-500/50 rounded-md">
+              <p className="text-green-400 font-bold text-center">
+                Vielen Dank! Ihre Nachricht wurde erfolgreich gesendet.
+              </p>
+            </div>
+          )}
+          {submitStatus === "error" && (
+            <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-md">
+              <p className="text-red-400 font-bold text-center">
+                Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.
+              </p>
+            </div>
+          )}
+
           <div className="mt-8">
             <button
               type="submit"
-              className="w-full px-6 py-3 bg-primary text-primary-foreground font-bold rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform transition-all duration-300"
+              disabled={isSubmitting}
+              className="w-full px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg shadow-lg shadow-yellow-500/30 dark:shadow-yellow-500/20 hover:bg-yellow-500 hover:shadow-xl hover:shadow-yellow-500/40 transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:translate-y-0 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700"
             >
-              Anfrage senden
+              {isSubmitting ? "Wird gesendet..." : "Anfrage senden"}
             </button>
           </div>
         </form>
