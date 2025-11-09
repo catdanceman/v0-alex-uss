@@ -1,15 +1,17 @@
 "use client"
 
+import type React from "react"
+
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import Image from "next/image"
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog"
 import { X, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState, useEffect } from "react"
-import { ParallaxCard } from "./parallax-card"
 
 export function PortfolioSection() {
   const ref = useScrollAnimation()
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
+  const [transforms, setTransforms] = useState<{ [key: number]: string }>({})
 
   const allImages = [
     {
@@ -78,6 +80,31 @@ export function PortfolioSection() {
     },
   ]
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>, index: number) => {
+    const card = e.currentTarget
+    const rect = card.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+
+    const rotateX = ((y - centerY) / centerY) * 8
+    const rotateY = ((centerX - x) / centerX) * 8
+
+    setTransforms((prev) => ({
+      ...prev,
+      [index]: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`,
+    }))
+  }
+
+  const handleMouseLeave = (index: number) => {
+    setTransforms((prev) => ({
+      ...prev,
+      [index]: "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+    }))
+  }
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedImageIndex === null) return
@@ -124,21 +151,26 @@ export function PortfolioSection() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {portfolioItems.map((item, index) => (
-              <ParallaxCard key={index} intensity={8}>
-                <div
-                  className={`group overflow-hidden rounded-xl relative ${item.span} h-64 md:h-80 cursor-pointer`}
-                  onClick={() => setSelectedImageIndex(index)}
-                >
-                  <Image
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.title}
-                    fill
-                    className="object-cover transform group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300" />
-                  <p className="absolute bottom-4 left-4 text-white font-bold text-lg z-10">{item.title}</p>
-                </div>
-              </ParallaxCard>
+              <div
+                key={index}
+                className={`group overflow-hidden rounded-xl relative ${item.span} h-64 md:h-80 cursor-pointer`}
+                style={{
+                  transform: transforms[index] || "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+                  transition: "transform 0.1s ease-out",
+                }}
+                onMouseMove={(e) => handleMouseMove(e, index)}
+                onMouseLeave={() => handleMouseLeave(index)}
+                onClick={() => setSelectedImageIndex(index)}
+              >
+                <Image
+                  src={item.image || "/placeholder.svg"}
+                  alt={item.title}
+                  fill
+                  className="object-cover transform group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300" />
+                <p className="absolute bottom-4 left-4 text-white font-bold text-lg z-10">{item.title}</p>
+              </div>
             ))}
           </div>
         </div>
