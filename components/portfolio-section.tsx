@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog"
 import { X, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState, useEffect } from "react"
+import { ParallaxCard } from "./parallax-card"
 
 export function PortfolioSection() {
   const ref = useScrollAnimation()
@@ -123,20 +124,21 @@ export function PortfolioSection() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {portfolioItems.map((item, index) => (
-              <div
-                key={index}
-                className={`group overflow-hidden rounded-xl relative ${item.span} h-64 md:h-80 cursor-pointer`}
-                onClick={() => setSelectedImageIndex(index)}
-              >
-                <Image
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.title}
-                  fill
-                  className="object-cover transform group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300" />
-                <p className="absolute bottom-4 left-4 text-white font-bold text-lg z-10">{item.title}</p>
-              </div>
+              <ParallaxCard key={index} intensity={8}>
+                <div
+                  className={`group overflow-hidden rounded-xl relative ${item.span} h-64 md:h-80 cursor-pointer`}
+                  onClick={() => setSelectedImageIndex(index)}
+                >
+                  <Image
+                    src={item.image || "/placeholder.svg"}
+                    alt={item.title}
+                    fill
+                    className="object-cover transform group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300" />
+                  <p className="absolute bottom-4 left-4 text-white font-bold text-lg z-10">{item.title}</p>
+                </div>
+              </ParallaxCard>
             ))}
           </div>
         </div>
