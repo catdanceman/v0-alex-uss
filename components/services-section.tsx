@@ -54,9 +54,9 @@ export function ServicesSection() {
             const Icon = service.icon
             return (
               <ParallaxCard key={index} intensity={10}>
-                <div className="p-8 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
-                  <div className="h-16 w-16 mb-6 mx-auto card-icon">
-                    <Icon className="w-full h-full" strokeWidth={1.5} />
+                <div className="p-8 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 h-full flex flex-col items-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-400 rounded-full mb-6 card-icon animate-subtle-zoom">
+                    <Icon className="w-8 h-8 text-gray-900" strokeWidth={2} />
                   </div>
                   <h3 className="text-xl font-bold text-center text-foreground mb-3">{service.title}</h3>
                   <p className="text-center text-muted-foreground">{service.description}</p>
